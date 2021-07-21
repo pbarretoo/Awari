@@ -1,0 +1,2 @@
+
+Create index cust_id on olist_orders_dataset(custumer_id)

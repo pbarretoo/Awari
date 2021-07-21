@@ -1,0 +1,82 @@
+Exercicio 3.1
+
+select 
+estado,
+cidade,
+limite_dias_entrega,
+case
+when limite_dias)entrega < dias_entrega then 'Fora do prazo'
+else 'Dentro do prazo'
+end as prazo
+from
+(
+select 
+cust.customer_state as estado,
+cust.customer_city as cidade,
+ordit.order_item_id as item_vendido,
+ord.order_status as status_pedido,
+julianday(ord.order_approved_at) - julianday(ord.order_delivered_carrier_date) as dias_entrega,
+julianday(ord.order_delivered_customer_date) - julianday(ordit.shipping_limit_date) as limite_dias_entrega
+from olist_orders_dataset as ord
+left join olist_order_items_dataset as ordit on ord.order_id = ordit_order_id
+left join olist_customers_dataset as cust on ord.customer_id = cust.customer_id
+where
+status_pedido <> 'canceled' and
+status_pedido <> 'processing' and
+status_pedido <> 'unavailable' and
+status_pedido <> 'created' and
+status_pedido <> 'invoiced' and
+status_pedido <> 'shippeed' as
+tabela
+order by estado asc, cidade asc
+
+
+================================================================
+Exercicio 3.2
+select *
+from (
+cliente,
+data_aporvacao,
+valor_da_compra,
+sum(valor_da_compra) over (partition by cliente order by valor_da_compra asc) as valor_total
+from 
+(
+select
+cust.customer_id as cliente, 
+ord.order_approved_at as data_aprovacao,
+payment_value as valor_da_compra
+from olist_order_payments_dataset as pay
+left join olist_order_dataset as ord on pay.order_id = ord.order_id
+left join olist_customers_dataset as cust on ord.customer_id = cust.customer_id)
+as tab)
+where valor_total <> valor_compra
+ 
+===================================================================
+
+Exercicio 3.3
+
+create temporary table test as 
+select 
+prod.product_category_name as categoria,
+sum(pay.payment_value) as valor
+from olist_products_dataset as prod
+left join olist_order_items_dataset as ordit on ordit.product_id = prod.product_id
+left join olist_oreder_payments_dataset as pay on pay.order_id = ordit.order_id
+where categoria is not null
+group by categoria
+
+select 
+categoria,
+valor
+sum(valor) over  (order by valor desc) as soma_acumulada,
+rank () over (order by valor desc) as ranqueamento
+from 
+(
+"teste")
+select 
+prod.payment_category_name as categoria,
+pay.paymnet_value) over (partition by prod.product_category_name) as valor_total_categoria
+from olist_products_dataset as prod
+left join olist_order_items_dataset as ordit on ordit.product_id = prod.product_id
+left join olist_order_payments_dataset as pay on pay.order_id = ordit.order_id
+where categoria is not null

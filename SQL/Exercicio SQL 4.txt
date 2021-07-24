@@ -1,0 +1,38 @@
+SQL 4.1
+create view vendedor_status as 
+with orders as (select *, cast (julianday("order_delivered_carrier_date") - julianday("oreder_approved_at") as integer) as dias_para_postagem from olist_orders_dataset)
+select 
+SEL.seller_id,
+avg (ORD.dias_para_postagem) as media_para_postagem,
+count(1) as qtd_itens_postados,
+count(distinct ord.order_id) as qtd_pedidos
+from orders as ord
+left join olist_order_items_dataset as ORI
+on ord.order_id = ori.order_id
+left join olist_sellers_dataset as SEL
+on ori.seller_id = sel.seller_id
+where sel.seller_id is not null
+group by sel.seller_id
+order by qtd_itens_postados desc
+======================================
+SQL 4.2
+Select
+customer_id,
+state,
+city,
+value,
+approval_date,
+lag(value) over (partition by state, city) as preview_buy
+from ( select
+cust.customer_id as customer,
+cust.customer_state as state,
+cust.customer_city as city,
+pay.payment_value as value,
+ord.order_approved_at as approval_date
+from olist_order_payments_dataset as dspay
+left join olist_orders_dataset as ord
+on dspay.order_id = ord.order_id
+left join olist_customer_dataset as cst
+on ord.customer_id = cst.customer_id)
+as tab
+where value >= preview_buy
